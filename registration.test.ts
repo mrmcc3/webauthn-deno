@@ -3,29 +3,51 @@ import { base64urlEncode, hexDecode, jsonDecode } from "./encoding.ts";
 import { RegistrationCredential, verifyRegistration } from "./registration.ts";
 
 const case1 = {
-	expectedChallenge: "abababababababababababababababab",
+	challenge: "abababababababababababababababab",
 	allowedOrigins: ["http://localhost:8000"],
 	allowedRPs: ["localhost"],
-	creationOpts:
-		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","q6urqw"],"name":"jdoe","displayName":"John Doe"},"challenge":["~b","q6urq6urq6urq6urq6urqw"],"pubKeyCredParams":[{"alg":-8,"type":"public-key"},{"alg":-7,"type":"public-key"},{"alg":-35,"type":"public-key"},{"alg":-36,"type":"public-key"},{"alg":-37,"type":"public-key"},{"alg":-38,"type":"public-key"},{"alg":-39,"type":"public-key"},{"alg":-257,"type":"public-key"},{"alg":-258,"type":"public-key"},{"alg":-259,"type":"public-key"}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
-	creationResp:
-		`{"rawId":["~b","bdYW5bSpRL92idIHIyewXCfcppkuCjFlSV_MOcuPEVY"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicTZ1cnE2dXJxNnVycTZ1cnE2dXJxdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZSwib3RoZXJfa2V5c19jYW5fYmVfYWRkZWRfaGVyZSI6ImRvIG5vdCBjb21wYXJlIGNsaWVudERhdGFKU09OIGFnYWluc3QgYSB0ZW1wbGF0ZS4gU2VlIGh0dHBzOi8vZ29vLmdsL3lhYlBleCJ9"],"attestationObject":["~b","o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAAAAAAAAAAAAAAAAAAAAAAAAAIG3WFuW0qUS_donSByMnsFwn3KaZLgoxZUlfzDnLjxFWpQECAyYgASFYIOU38k8Zx53ZyeOLOaLTc7hyxh1rCtT5E4CmAras7FWXIlggBYs50cSstWOkgb8MHBVpu5z-SCXAQRmc4V8r4jo4CUI"]}}`,
-	credentialId: "bdYW5bSpRL92idIHIyewXCfcppkuCjFlSV_MOcuPEVY",
-	publicKey: "pQECAyYgASFYIOU38k8Zx53ZyeOLOaLTc7hyxh1rCtT5E4CmAras7FWXIlggBYs50cSstWOkgb8MHBVpu5z-SCXAQRmc4V8r4jo4CUI",
+	user: { id: "abababab", name: "case1", displayName: "Case 1" },
+	pubKeyCredParams: [{ type: "public-key", alg: -7 }], // ES256
+	encodedRegOpts:
+		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","q6urqw"],"name":"case1","displayName":"Case 1"},"challenge":["~b","q6urq6urq6urq6urq6urqw"],"pubKeyCredParams":[{"type":"public-key","alg":-7}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
+	encodedRegCred:
+		`{"rawId":["~b","shIaRNpGuNM0BoH55SB2mr1SQxfttSnjxVRRVNgufXc"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoicTZ1cnE2dXJxNnVycTZ1cnE2dXJxdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"],"attestationObject":["~b","o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVikSZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2NFAAAAAAAAAAAAAAAAAAAAAAAAAAAAILISGkTaRrjTNAaB-eUgdpq9UkMX7bUp48VUUVTYLn13pQECAyYgASFYIMYgVZSLVApLJVhP5gUUnrh1lBPMGb7lpi37iQx16mn7IlggOROohidXDm1xzHYgqRzcIno6PztoqglEIbyC6TvClnA"]}}`,
+	credId: "shIaRNpGuNM0BoH55SB2mr1SQxfttSnjxVRRVNgufXc",
+	encodedAuthOpts:
+		`{"challenge":["~b","q6urq6urq6urq6urq6urqw"],"timeout":300000,"allowCredentials":[{"type":"public-key","id":["~b","shIaRNpGuNM0BoH55SB2mr1SQxfttSnjxVRRVNgufXc"]}],"userVerification":"required","attestation":"none"}`,
+	encodedAuthCred:
+		`{"rawId":["~b","shIaRNpGuNM0BoH55SB2mr1SQxfttSnjxVRRVNgufXc"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicTZ1cnE2dXJxNnVycTZ1cnE2dXJxdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"],"authenticatorData":["~b","SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAAAQ"],"signature":["~b","MEYCIQCEFRUHNql0i44X4yOyKwyjT4RCscmrTsDDEHnnKerPXAIhAI6qS1eTeid0JB7ly8HaibDRd9ngZyDoq1hz2XFL5j6Y"],"userHandle":["~b","q6urqw"]}}`,
+};
+
+const case2 = {
+	challenge: "01010101010101010101010101010101",
+	allowedOrigins: ["http://localhost:8000"],
+	allowedRPs: ["localhost"],
+	user: { id: "01010101", name: "case2", displayName: "Case 2" },
+	pubKeyCredParams: [{ type: "public-key", alg: -257 }], // RS256
+	encodedRegOpts:
+		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","AQEBAQ"],"name":"case2","displayName":"Case 2"},"challenge":["~b","AQEBAQEBAQEBAQEBAQEBAQ"],"pubKeyCredParams":[{"type":"public-key","alg":-257}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
+	encodedRegCred:
+		`{"rawId":["~b","rZ-d-bPQEPa80yLxQf7FXoia0RO-zn13kVVkg5dhWCA"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQVFFQkFRRUJBUUVCQVFFQkFRRUJBUSIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"],"attestationObject":["~b","o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVkBZ0mWDeWIDoxodDQXD2R2YFuP5K65ooYyx5lc87qDHZdjRQAAAAAAAAAAAAAAAAAAAAAAAAAAACCtn535s9AQ9rzTIvFB_sVeiJrRE77OfXeRVWSDl2FYIKQBAwM5AQAgWQEApkwf-c4xcjULc7V9EfzWGxLdKD43y34IzeegEIbTojb-Vk7-DD82Xt7RulH7paXPBJIVXhsLRr4s1j82IAc-Dm9oasgBz0Bre1n7ERm0oozc8C4LKKS6X54XF4mwNtMBadVTlduRlUGnwd4bF3Ok56vLSipRJlCAtnP73i1rZpG1ekIBxf8OIeh5f1uPeW4SpkMjzeituh_vfyY933N31nQtWnqEAntJ1UTrT_HJPWeO1-gXmu0YcSOUBltX3LTKURLZWWn1PN6lMN3BE4ylzbUeyo09Fm5_IYiFTfjOuE1NCBSDYNvseSAOSfCzyhM9pAJ9l10wPH3ngCu6HADF2SFDAQAB"]}}`,
+	credId: "rZ-d-bPQEPa80yLxQf7FXoia0RO-zn13kVVkg5dhWCA",
+	encodedAuthOpts:
+		`{"challenge":["~b","AQEBAQEBAQEBAQEBAQEBAQ"],"timeout":300000,"allowCredentials":[{"type":"public-key","id":["~b","rZ-d-bPQEPa80yLxQf7FXoia0RO-zn13kVVkg5dhWCA"]}],"userVerification":"required","attestation":"none"}`,
+	encodedAuthCred:
+		`{"rawId":["~b","rZ-d-bPQEPa80yLxQf7FXoia0RO-zn13kVVkg5dhWCA"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQVFFQkFRRUJBUUVCQVFFQkFRRUJBUSIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"],"authenticatorData":["~b","SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAAAQ"],"signature":["~b","HRy0h0jm22YmSAlR5P-QDq9x2RmRsyfKxCpJCBwJDs99jOGjwUl31ba_nhGTpuvnF-PHAZePn_OeQ6esH5vfL6eqKR6-Fbq55pcnu1s_JJT8RcQh1l7pRQfbcseD53xJlL7DyYX55gxMURNluRBgTgWiUc0HdcB5MPVCHxt528z-0vXHDLjO2Lzqt1Pbu_GzC7JbBsAudRQDij6e7jTCMjW-YaFlTfeBegwd1h9OpmeJEeEkj8TNc-wAK1TJahV0-TDXRV7EAlRVr4i_OJn1kVCWbAPVVgXW-Ep-my8WbQ1gvRjIjnUu8SLcYB8oZHbinhqwaHWOf32rdmUAAbx7Xw"],"userHandle":["~b","AQEBAQ"]}}`,
 };
 
 Deno.test({
-	name: "test registration",
+	name: "test registration case 1",
 	async fn() {
-		const { creationResp, credentialId, publicKey, expectedChallenge, allowedOrigins, allowedRPs } = case1;
+		const { encodedRegCred, challenge, allowedOrigins, allowedRPs } = case1;
+		const credential = jsonDecode(encodedRegCred) as RegistrationCredential;
 		const res = await verifyRegistration({
-			credential: jsonDecode(creationResp) as RegistrationCredential,
-			expectedChallenge: hexDecode(expectedChallenge),
+			credential: credential,
+			expectedChallenge: hexDecode(challenge),
 			allowedOrigins,
 			allowedRPs,
 		});
 		assertEquals(res.sigCount, 0);
-		assertEquals(base64urlEncode(res.credentialId), credentialId);
-		assertEquals(base64urlEncode(res.publicKey), publicKey);
+		assertEquals(base64urlEncode(res.credentialId), base64urlEncode(credential.rawId));
 	},
 });
