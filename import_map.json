@@ -1,0 +1,6 @@
+{
+	"imports": {
+		"std/": "https://deno.land/std@0.167.0/",
+		"cbor-x/": "https://deno.land/x/cbor@v1.4.1/"
+	}
+}
