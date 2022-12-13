@@ -1,3 +1,5 @@
+import { algorithms } from "./keys.ts";
+
 // Creation Options https://w3c.github.io/webauthn/#dictionary-makecredentialoptions
 
 type AuthenticatorTransport = "usb" | "nfc" | "ble" | "hybrid" | "internal";
@@ -22,7 +24,7 @@ type ResidentKeyRequirement = "discouraged" | "preferred" | "required";
 
 interface PublicKeyCredentialParameters {
 	type: PublicKeyCredentialType;
-	alg: string;
+	alg: number;
 }
 
 interface AuthenticatorSelectionCriteria {
@@ -56,6 +58,11 @@ interface CredentialCreationArgs {
 	authenticatorSelection?: AuthenticatorSelectionCriteria;
 }
 
+const pubKeyCredParams = Array.from(algorithms.keys()).map((alg) => ({
+	alg,
+	type: "public-key",
+} as PublicKeyCredentialParameters));
+
 export function credentialCreationOptions(
 	{
 		rp,
@@ -83,7 +90,7 @@ export function credentialCreationOptions(
 		rp,
 		user,
 		challenge,
-		pubKeyCredParams: [],
+		pubKeyCredParams,
 		timeout,
 		excludeCredentials,
 		authenticatorSelection,

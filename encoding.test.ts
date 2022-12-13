@@ -29,3 +29,9 @@ Deno.test({
 		assertEquals(base64urlEncode(arr), base64urlEncode(na));
 	},
 });
+
+Deno.test({
+	name: "TODO test cbor decode on a credential",
+	ignore: true,
+	fn() {},
+});
