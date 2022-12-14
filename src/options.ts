@@ -11,7 +11,7 @@ interface PublicKeyCredentialEntity {
 }
 
 interface PublicKeyCredentialRpEntity extends PublicKeyCredentialEntity {
-	id: string;
+	id?: string;
 }
 
 interface PublicKeyCredentialUserEntity extends PublicKeyCredentialEntity {
