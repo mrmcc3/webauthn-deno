@@ -1,13 +1,18 @@
 import { assertEquals } from "std/testing/asserts.ts";
-import { base64urlEncode, hexDecode, jsonDecode } from "./encoding.ts";
-import { RegistrationCredential, verifyRegistration } from "./registration.ts";
+import { hexDecode, hexEncode, jsonDecode } from "./encoding.ts";
+import {
+	AuthenticationCredential,
+	RegistrationCredential,
+	verifyAuthentication,
+	verifyRegistration,
+} from "./verify.ts";
 
-const case1 = {
+const ES256 = {
 	challenge: "abababababababababababababababab",
 	allowedOrigins: ["http://localhost:8000"],
 	allowedRPs: ["localhost"],
 	user: { id: "abababab", name: "case1", displayName: "Case 1" },
-	pubKeyCredParams: [{ type: "public-key", alg: -7 }], // ES256
+	pubKeyCredParams: [{ type: "public-key", alg: -7 }],
 	encodedRegOpts:
 		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","q6urqw"],"name":"case1","displayName":"Case 1"},"challenge":["~b","q6urq6urq6urq6urq6urqw"],"pubKeyCredParams":[{"type":"public-key","alg":-7}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
 	encodedRegCred:
@@ -19,12 +24,12 @@ const case1 = {
 		`{"rawId":["~b","shIaRNpGuNM0BoH55SB2mr1SQxfttSnjxVRRVNgufXc"],"response":{"clientDataJSON":["~b","eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoicTZ1cnE2dXJxNnVycTZ1cnE2dXJxdyIsIm9yaWdpbiI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMCIsImNyb3NzT3JpZ2luIjpmYWxzZX0"],"authenticatorData":["~b","SZYN5YgOjGh0NBcPZHZgW4_krrmihjLHmVzzuoMdl2MFAAAAAQ"],"signature":["~b","MEYCIQCEFRUHNql0i44X4yOyKwyjT4RCscmrTsDDEHnnKerPXAIhAI6qS1eTeid0JB7ly8HaibDRd9ngZyDoq1hz2XFL5j6Y"],"userHandle":["~b","q6urqw"]}}`,
 };
 
-const case2 = {
+const RS256 = {
 	challenge: "01010101010101010101010101010101",
 	allowedOrigins: ["http://localhost:8000"],
 	allowedRPs: ["localhost"],
 	user: { id: "01010101", name: "case2", displayName: "Case 2" },
-	pubKeyCredParams: [{ type: "public-key", alg: -257 }], // RS256
+	pubKeyCredParams: [{ type: "public-key", alg: -257 }],
 	encodedRegOpts:
 		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","AQEBAQ"],"name":"case2","displayName":"Case 2"},"challenge":["~b","AQEBAQEBAQEBAQEBAQEBAQ"],"pubKeyCredParams":[{"type":"public-key","alg":-257}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
 	encodedRegCred:
@@ -37,17 +42,51 @@ const case2 = {
 };
 
 Deno.test({
-	name: "test registration case 1",
+	name: "ES256",
 	async fn() {
-		const { encodedRegCred, challenge, allowedOrigins, allowedRPs } = case1;
-		const credential = jsonDecode(encodedRegCred) as RegistrationCredential;
-		const res = await verifyRegistration({
-			credential: credential,
+		const { encodedRegCred, encodedAuthCred, challenge, allowedOrigins, allowedRPs, user } = ES256;
+		const regCredential = jsonDecode(encodedRegCred) as RegistrationCredential;
+		const { credId, pubKey, sigCount: sc1 } = await verifyRegistration({
+			credential: regCredential,
 			expectedChallenge: hexDecode(challenge),
 			allowedOrigins,
 			allowedRPs,
 		});
-		assertEquals(res.sigCount, 0);
-		assertEquals(base64urlEncode(res.credentialId), base64urlEncode(credential.rawId));
+		assertEquals(sc1, 0);
+		const authCredential = jsonDecode(encodedAuthCred) as AuthenticationCredential;
+		assertEquals(hexEncode(authCredential.rawId), hexEncode(credId));
+		const { sigCount: sc2 } = await verifyAuthentication({
+			expectedChallenge: hexDecode(challenge),
+			credential: authCredential,
+			allowedOrigins,
+			allowedRPs,
+			storedCredential: { userId: hexDecode(user.id), pubKey, sigCount: sc1 },
+		});
+		assertEquals(sc2, 1);
+	},
+});
+
+Deno.test({
+	name: "RS256",
+	async fn() {
+		const { encodedRegCred, encodedAuthCred, challenge, allowedOrigins, allowedRPs, user } = RS256;
+		const regCredential = jsonDecode(encodedRegCred) as RegistrationCredential;
+		const { credId, pubKey, sigCount: sc1 } = await verifyRegistration({
+			credential: regCredential,
+			expectedChallenge: hexDecode(challenge),
+			allowedOrigins,
+			allowedRPs,
+		});
+		assertEquals(sc1, 0);
+		const authCredential = jsonDecode(encodedAuthCred) as AuthenticationCredential;
+		assertEquals(hexEncode(authCredential.rawId), hexEncode(credId));
+		const { sigCount: sc2 } = await verifyAuthentication({
+			expectedChallenge: hexDecode(challenge),
+			credential: authCredential,
+			allowedOrigins,
+			allowedRPs,
+			storedCredential: { userId: hexDecode(user.id), pubKey, sigCount: sc1 },
+		});
+		assertEquals(sc2, 1);
 	},
 });

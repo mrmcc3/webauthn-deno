@@ -68,24 +68,26 @@ export function credentialCreationOptions(
 		rp,
 		user,
 		challenge = crypto.getRandomValues(new Uint8Array(16)),
-		authenticatorSelection,
+		authenticatorSelection = { userVerification: "required", residentKey: "required" },
 		excludeCredentials = [],
-		timeout = authenticatorSelection?.userVerification === "discouraged" ? 120000 : 300000,
+		timeout = 300000,
 	}: CredentialCreationArgs,
 ): PublicKeyCredentialCreationOptions {
 	if (challenge.byteLength < 16) {
 		throw new Error("challenge should be at least 16 bytes");
 	}
-	if (authenticatorSelection?.requireResidentKey) {
-		console.warn("This ");
+	// currently only support user verified authenticators with resident keys.
+	if (authenticatorSelection.userVerification !== "required") {
+		throw new Error(
+			"userVerification must be set to required. other options are currently not supported",
+		);
 	}
-	if (authenticatorSelection) {
-		if (authenticatorSelection.residentKey === "required") {
-			authenticatorSelection.requireResidentKey = true;
-		} else {
-			delete authenticatorSelection.requireResidentKey;
-		}
+	if (authenticatorSelection.residentKey !== "required") {
+		throw new Error(
+			"residentKey must be set to required. other options are currently not supported",
+		);
 	}
+	authenticatorSelection.requireResidentKey = true;
 	return {
 		rp,
 		user,
@@ -126,13 +128,18 @@ interface CredentialRequestArgs {
 
 export function credentialRequestOptions({
 	challenge = crypto.getRandomValues(new Uint8Array(16)),
-	userVerification = "preferred",
-	timeout = userVerification === "discouraged" ? 120000 : 300000,
+	userVerification = "required",
+	timeout = 300000,
 	allowCredentials = [],
 	rpId,
 }: CredentialRequestArgs = {}): PublicKeyCredentialRequestOptions {
 	if (challenge.byteLength < 16) {
 		throw new Error("challenge should be at least 16 bytes");
+	}
+	if (userVerification !== "required") {
+		throw new Error(
+			"userVerification must be set to required. other options are currently not supported",
+		);
 	}
 	return {
 		challenge,

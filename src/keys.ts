@@ -2,17 +2,21 @@ import { base64urlEncode, cborDecode } from "./encoding.ts";
 
 // COSE https://www.iana.org/assignments/cose/cose.xhtml
 
+// can uncomment algorithms when a test case exists in verify.test.ts
 export const algorithms = new Map([
-	[-8, "EdDSA"],
+	// [-8, "EdDSA"],
+
 	[-7, "ES256"],
-	[-35, "ES384"],
-	[-36, "ES512"],
-	[-37, "PS256"],
-	[-38, "PS384"],
-	[-39, "PS512"],
+	// [-35, "ES384"],
+	// [-36, "ES512"],
+
+	// [-37, "PS256"],
+	// [-38, "PS384"],
+	// [-39, "PS512"],
+
 	[-257, "RS256"],
-	[-258, "RS384"],
-	[-259, "RS512"],
+	// [-258, "RS384"],
+	// [-259, "RS512"],
 ]);
 
 const keyTypes = new Map([

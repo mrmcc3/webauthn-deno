@@ -37,5 +37,5 @@ export function jsonDecode(text: string) {
 	return JSON.parse(text, reviver);
 }
 
-export { decode as cborDecode, encode as cborEncode } from "cbor-x/index.js";
+export { decode as cborDecode } from "cbor-x/index.js";
 export { decode as base64urlDecode, encode as base64urlEncode } from "std/encoding/base64url.ts";
