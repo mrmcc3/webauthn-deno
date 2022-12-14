@@ -7,4 +7,9 @@ export {
 	jsonEncode,
 } from "./src/encoding.ts";
 export { credentialCreationOptions, credentialRequestOptions } from "./src/options.ts";
-export { verifyAuthentication, verifyRegistration } from "./src/verify.ts";
+export {
+	decodeAuthCredential,
+	decodeRegCredential,
+	verifyAuthentication,
+	verifyRegistration,
+} from "./src/verify.ts";

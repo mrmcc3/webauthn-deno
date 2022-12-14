@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
 import { jsonDecode, jsonEncode } from "./encoding.ts";
 import {
 	credentialCreationOptions,

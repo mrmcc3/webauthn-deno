@@ -1,4 +1,4 @@
-import { base64urlEncode, cborDecode, hexEncode } from "./encoding.ts";
+import { base64urlEncode, cborDecode, hexEncode, jsonDecode } from "./encoding.ts";
 import { algorithms, verifySignature } from "./keys.ts";
 
 // --- helpers ---
@@ -25,6 +25,14 @@ function concatBuffers(b1: ArrayBuffer, b2: ArrayBuffer) {
 	res.set(new Uint8Array(b1), 0);
 	res.set(new Uint8Array(b2), b1.byteLength);
 	return res;
+}
+
+export function decodeRegCredential(str: string) {
+	return jsonDecode(str) as RegistrationCredential;
+}
+
+export function decodeAuthCredential(str: string) {
+	return jsonDecode(str) as AuthenticationCredential;
 }
 
 // --- Registration (credential attestation) ---
