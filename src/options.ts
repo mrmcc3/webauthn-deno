@@ -4,7 +4,6 @@ import { algorithms } from "./keys.ts";
 
 type AuthenticatorTransport = "usb" | "nfc" | "ble" | "hybrid" | "internal";
 type UserVerificationRequirement = "required" | "preferred" | "discouraged";
-type PublicKeyCredentialType = "public-key";
 
 interface PublicKeyCredentialEntity {
 	name: string;
@@ -23,7 +22,7 @@ type AuthenticatorAttachment = "platform" | "cross-platform";
 type ResidentKeyRequirement = "discouraged" | "preferred" | "required";
 
 interface PublicKeyCredentialParameters {
-	type: PublicKeyCredentialType;
+	type: string;
 	alg: number;
 }
 
@@ -61,7 +60,7 @@ interface CredentialCreationArgs {
 const pubKeyCredParams = Array.from(algorithms.keys()).map((alg) => ({
 	alg,
 	type: "public-key",
-} as PublicKeyCredentialParameters));
+}));
 
 export function credentialCreationOptions(
 	{
@@ -103,7 +102,7 @@ export function credentialCreationOptions(
 // Assertion Options https://w3c.github.io/webauthn/#dictionary-assertion-options
 
 interface PublicKeyCredentialDescriptor {
-	type: PublicKeyCredentialType;
+	type: string;
 	id: Uint8Array;
 	transports?: AuthenticatorTransport[];
 }
