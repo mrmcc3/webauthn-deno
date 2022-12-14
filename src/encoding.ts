@@ -1,5 +1,11 @@
-import { decode as hexDecodeBytes, encode as hexEncodeBytes } from "std/encoding/hex.ts";
-import { decode as base64urlDecode, encode as base64urlEncode } from "std/encoding/base64url.ts";
+import {
+	decode as hexDecodeBytes,
+	encode as hexEncodeBytes,
+} from "https://deno.land/std@0.167.0/encoding/hex.ts";
+import {
+	decode as base64urlDecode,
+	encode as base64urlEncode,
+} from "https://deno.land/std@0.167.0/encoding/base64url.ts";
 
 export function hexDecode(input: string) {
 	return hexDecodeBytes(new TextEncoder().encode(input));
@@ -37,5 +43,8 @@ export function jsonDecode(text: string) {
 	return JSON.parse(text, reviver);
 }
 
-export { decode as cborDecode } from "cbor-x/index.js";
-export { decode as base64urlDecode, encode as base64urlEncode } from "std/encoding/base64url.ts";
+export { decode as cborDecode } from "https://deno.land/x/cbor@v1.4.1/index.js";
+export {
+	decode as base64urlDecode,
+	encode as base64urlEncode,
+} from "https://deno.land/std@0.167.0/encoding/base64url.ts";
