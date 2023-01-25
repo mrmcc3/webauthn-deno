@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.167.0/testing/asserts.ts";
-import { hexDecode, hexEncode, jsonDecode } from "./encoding.ts";
+import { jsonDecode } from "./encoding.ts";
 import {
 	AuthenticationCredential,
 	RegistrationCredential,
@@ -8,10 +8,10 @@ import {
 } from "./verify.ts";
 
 const ES256 = {
-	challenge: "abababababababababababababababab",
+	challenge: new Uint8Array(16).map((_) => 171),
 	allowedOrigins: ["http://localhost:8000"],
 	allowedRPs: ["localhost"],
-	user: { id: "abababab", name: "case1", displayName: "Case 1" },
+	user: { id: new Uint8Array([171, 171, 171, 171]), name: "case1", displayName: "Case 1" },
 	pubKeyCredParams: [{ type: "public-key", alg: -7 }],
 	encodedRegOpts:
 		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","q6urqw"],"name":"case1","displayName":"Case 1"},"challenge":["~b","q6urq6urq6urq6urq6urqw"],"pubKeyCredParams":[{"type":"public-key","alg":-7}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
@@ -25,10 +25,10 @@ const ES256 = {
 };
 
 const RS256 = {
-	challenge: "01010101010101010101010101010101",
+	challenge: new Uint8Array(16).map((_) => 1),
 	allowedOrigins: ["http://localhost:8000"],
 	allowedRPs: ["localhost"],
-	user: { id: "01010101", name: "case2", displayName: "Case 2" },
+	user: { id: new Uint8Array([1, 1, 1, 1]), name: "case2", displayName: "Case 2" },
 	pubKeyCredParams: [{ type: "public-key", alg: -257 }],
 	encodedRegOpts:
 		`{"rp":{"id":"localhost","name":"LocalHost!"},"user":{"id":["~b","AQEBAQ"],"name":"case2","displayName":"Case 2"},"challenge":["~b","AQEBAQEBAQEBAQEBAQEBAQ"],"pubKeyCredParams":[{"type":"public-key","alg":-257}],"timeout":300000,"excludeCredentials":[],"authenticatorSelection":{"authenticatorAttachment":"platform","residentKey":"required","userVerification":"required","requireResidentKey":true},"attestation":"none"}`,
@@ -48,19 +48,19 @@ Deno.test({
 		const regCredential = jsonDecode(encodedRegCred) as RegistrationCredential;
 		const { credId, pubKey, sigCount: sc1 } = await verifyRegistration({
 			credential: regCredential,
-			expectedChallenge: hexDecode(challenge),
+			expectedChallenge: challenge,
 			allowedOrigins,
 			allowedRPs,
 		});
 		assertEquals(sc1, 0);
 		const authCredential = jsonDecode(encodedAuthCred) as AuthenticationCredential;
-		assertEquals(hexEncode(authCredential.rawId), hexEncode(credId));
+		assertEquals(authCredential.rawId, credId);
 		const { sigCount: sc2 } = await verifyAuthentication({
-			expectedChallenge: hexDecode(challenge),
+			expectedChallenge: challenge,
 			credential: authCredential,
 			allowedOrigins,
 			allowedRPs,
-			storedCredential: { userId: hexDecode(user.id), pubKey, sigCount: sc1 },
+			storedCredential: { userId: user.id, pubKey, sigCount: sc1 },
 		});
 		assertEquals(sc2, 1);
 	},
@@ -73,19 +73,19 @@ Deno.test({
 		const regCredential = jsonDecode(encodedRegCred) as RegistrationCredential;
 		const { credId, pubKey, sigCount: sc1 } = await verifyRegistration({
 			credential: regCredential,
-			expectedChallenge: hexDecode(challenge),
+			expectedChallenge: challenge,
 			allowedOrigins,
 			allowedRPs,
 		});
 		assertEquals(sc1, 0);
 		const authCredential = jsonDecode(encodedAuthCred) as AuthenticationCredential;
-		assertEquals(hexEncode(authCredential.rawId), hexEncode(credId));
+		assertEquals(authCredential.rawId, credId);
 		const { sigCount: sc2 } = await verifyAuthentication({
-			expectedChallenge: hexDecode(challenge),
+			expectedChallenge: challenge,
 			credential: authCredential,
 			allowedOrigins,
 			allowedRPs,
-			storedCredential: { userId: hexDecode(user.id), pubKey, sigCount: sc1 },
+			storedCredential: { userId: user.id, pubKey, sigCount: sc1 },
 		});
 		assertEquals(sc2, 1);
 	},

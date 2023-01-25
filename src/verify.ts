@@ -1,13 +1,18 @@
-import { base64urlEncode, cborDecode, hexEncode, jsonDecode } from "./encoding.ts";
+import { base64urlEncode, cborDecode, jsonDecode } from "./encoding.ts";
 import { algorithms, verifySignature } from "./keys.ts";
 
 // --- helpers ---
 
+function byteMatch(a: ArrayBuffer, b: ArrayBuffer) {
+	if (a.byteLength !== b.byteLength) return false;
+	const b_arr = new Uint8Array(b);
+	return new Uint8Array(a).every((v, i) => b_arr[i] === v);
+}
+
 async function checkRP(rpIdHash: Uint8Array, allowed: string[]) {
-	const hashHex = hexEncode(rpIdHash);
 	for (const id of allowed) {
 		const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(id));
-		if (hashHex === hexEncode(hash)) return true;
+		if (byteMatch(rpIdHash, hash)) return true;
 	}
 	throw new Error("relying party not allowed");
 }
@@ -117,7 +122,7 @@ export async function verifyRegistration({
 	const credIdLength = dv.getUint16(53);
 	const credEnd = 55 + credIdLength;
 	const credId = authData.slice(55, credEnd);
-	if (hexEncode(credId) !== hexEncode(rawId)) throw new Error("credential id mismatch");
+	if (!byteMatch(credId, rawId)) throw new Error("credential id mismatch");
 	const pubKey = authData.slice(credEnd);
 
 	// 17. check supported algorithm
@@ -188,7 +193,7 @@ export async function verifyAuthentication({
 
 	// 6. check user handle
 	if (!userHandle) throw new Error("userHandle is not present");
-	if (hexEncode(userHandle) !== hexEncode(userId)) {
+	if (!byteMatch(userHandle, userId)) {
 		throw new Error("userHandle is not associated with credential");
 	}
 

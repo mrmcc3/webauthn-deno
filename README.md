@@ -1,6 +1,6 @@
 # webauthn-deno
 
-A Deno Implementation of WebAuthn Registration/Authentication Ceremonies.
+Implementation of WebAuthn Registration/Authentication Ceremonies. Developed in Deno.
 
 ### Usage
 
